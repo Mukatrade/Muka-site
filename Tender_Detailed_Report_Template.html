@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Detailed Report - Sample</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .meta-value {
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 25px;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .tender-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-block {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            margin-top: 8px;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .link-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .link-button:hover {
+            background: #5568d3;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .items-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .items-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .item-row {
+            margin-bottom: 25px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .item-number {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .item-field {
+            margin-bottom: 10px;
+        }
+
+        .item-field-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .item-field-value {
+            margin-top: 5px;
+            color: #333;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .timeline-item {
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .timeline-time {
+            font-size: 1.1em;
+            margin-top: 5px;
+            color: #333;
+        }
+
+        .timezone-note {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .documents-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .documents-list li {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .documents-list li:before {
+            content: '✓';
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.2em;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .note-box strong {
+            color: #856404;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .export-section {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .export-section h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .item-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @page {
+            margin: 1in;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            .action-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📋 TENDER DETAILED SOURCING REPORT</h1>
+            <p style="margin-top: 5px; opacity: 0.9;">Complete information for tender analysis and bidding</p>
+
+            <div class="header-meta">
+                <div class="meta-item">
+                    <div class="meta-label">EMBASSY LOCATION</div>
+                    <div class="meta-value">U.S. Embassy - Riyadh, Saudi Arabia</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">TENDER NUMBER</div>
+                    <div class="meta-value">RYD-2026-04521</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">REPORT DATE</div>
+                    <div class="meta-value">April 18, 2026</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- TENDER OVERVIEW SECTION -->
+            <div class="section">
+                <h2>📍 Tender Overview</h2>
+
+                <div class="tender-info-grid">
+                    <div class="info-block">
+                        <div class="info-label">Tender Title</div>
+                        <div class="info-value">Supply of Office Equipment and Furniture for Embassy Expansion</div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Embassy</div>
+                        <div class="info-value">U.S. Embassy - Riyadh, Saudi Arabia</div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Tender Type</div>
+                        <div class="info-value">Request for Quotation (RFQ)</div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Contact Email</div>
+                        <div class="info-value">
+                            <a href="mailto:procurement@riyadh.usembassy.gov" class="link-button">📧 procurement@riyadh.usembassy.gov</a>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Tender Page</div>
+                        <div class="info-value">
+                            <a href="https://sa.usembassy.gov/procurement-solicitation-packages-riyadh/" target="_blank" class="link-button">🔗 View Tender Page</a>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Tender Documents</div>
+                        <div class="info-value">
+                            <a href="#" target="_blank" class="link-button">📄 RFQ_RYD-2026-04521.pdf</a>
+                            <a href="#" target="_blank" class="link-button" style="display: block; margin-top: 5px;">📄 Specifications.xlsx</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ITEMS SECTION -->
+            <div class="section">
+                <h2>📦 Items Requested (Detailed Breakdown)</h2>
+
+                <!-- ITEM 1 -->
+                <div class="item-row">
+                    <div class="item-number">ITEM #1: Office Desks</div>
+                    <div class="item-grid">
+                        <div class="item-field">
+                            <div class="item-field-label">Description</div>
+                            <div class="item-field-value">Executive office desks, wooden, dimensions 1.6m x 0.8m</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Quantity</div>
+                            <div class="item-field-value">25 units</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Exact Match Required?</div>
+                            <div class="item-field-value">❌ Equivalent items acceptable</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Item Link (Exact)</div>
+                            <div class="item-field-value">
+                                <a href="https://www.example.com/product/desk-12345" target="_blank" class="link-button">🔗 View Exact Model</a>
+                            </div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Item Family Link</div>
+                            <div class="item-field-value">
+                                <a href="https://www.alibaba.com/trade/search?SearchText=office%20desk" target="_blank" class="link-button">🔗 Office Desks Category</a>
+                                <div style="font-size: 0.85em; color: #f44336; margin-top: 5px;">⚠️ Family category only - verify specifications match</div>
+                            </div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Specifications</div>
+                            <div class="item-field-value">
+                                • Material: Wood (oak or equivalent)<br>
+                                • Dimensions: 1.6m (W) x 0.8m (D) x 0.75m (H)<br>
+                                • Color: Walnut or Natural<br>
+                                • Delivery: 45 days<br>
+                                • Warranty: 2 years
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEM 2 -->
+                <div class="item-row">
+                    <div class="item-number">ITEM #2: Office Chairs</div>
+                    <div class="item-grid">
+                        <div class="item-field">
+                            <div class="item-field-label">Description</div>
+                            <div class="item-field-value">Ergonomic office chairs, mesh back, adjustable height</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Quantity</div>
+                            <div class="item-field-value">50 units</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Exact Match Required?</div>
+                            <div class="item-field-value">✅ Exact match/model/brand required</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Item Link (Exact)</div>
+                            <div class="item-field-value">
+                                <a href="https://www.example.com/product/chair-herman-miller-aeron" target="_blank" class="link-button">🔗 Herman Miller Aeron Chair</a>
+                            </div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Specifications</div>
+                            <div class="item-field-value">
+                                • Brand: Herman Miller Aeron<br>
+                                • Style: Mesh back, task chair<br>
+                                • Size: Medium (B)<br>
+                                • Color: Carbon/Black<br>
+                                • Features: Full adjustability, armrests, lumbar support<br>
+                                • Warranty: 12 years
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEM 3 -->
+                <div class="item-row">
+                    <div class="item-number">ITEM #3: Conference Table</div>
+                    <div class="item-grid">
+                        <div class="item-field">
+                            <div class="item-field-label">Description</div>
+                            <div class="item-field-value">Large conference table, seats 12-14 people</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Quantity</div>
+                            <div class="item-field-value">2 units</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Exact Match Required?</div>
+                            <div class="item-field-value">❌ Equivalent items acceptable</div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Item Link (Exact)</div>
+                            <div class="item-field-value">
+                                <a href="https://example.com/conference-table-96" target="_blank" class="link-button">🔗 96" Conference Table</a>
+                            </div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Item Family Link</div>
+                            <div class="item-field-value">
+                                <a href="https://www.global-office.com/tables" target="_blank" class="link-button">🔗 Conference Tables Category</a>
+                            </div>
+                        </div>
+
+                        <div class="item-field">
+                            <div class="item-field-label">Specifications</div>
+                            <div class="item-field-value">
+                                • Length: 8-9 feet (240-270cm)<br>
+                                • Width: 3.5-4 feet (105-120cm)<br>
+                                • Material: Wood or laminate top<br>
+                                • Base: Metal or wooden<br>
+                                • Seating Capacity: 12-14 people<br>
+                                • Delivery: 50 days
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBMISSION DATES SECTION -->
+            <div class="section">
+                <h2>⏰ Submission Dates & Deadlines</h2>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-label">Publication Date</div>
+                        <div class="timeline-time">April 10, 2026</div>
+                        <div class="timezone-note">Published on tender page</div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-label">Deadline - LOCAL TIME (Riyadh, Saudi Arabia)</div>
+                        <div class="timeline-time">May 10, 2026 at 02:00 PM (AST - Arabia Standard Time)</div>
+                        <div class="timezone-note">UTC+3, GMT+3</div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-label">Deadline - KERALA, INDIA TIME</div>
+                        <div class="timeline-time">May 10, 2026 at 04:30 PM (IST - Indian Standard Time)</div>
+                        <div class="timezone-note">UTC+5:30, GMT+5:30 | Same day in Kerala</div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-label">Deadline - KAMPALA, UGANDA TIME</div>
+                        <div class="timeline-time">May 10, 2026 at 08:00 AM (EAT - East Africa Time)</div>
+                        <div class="timezone-note">UTC+3, GMT+3 | Same day in Kampala</div>
+                    </div>
+
+                    <div class="note-box">
+                        <strong>⚠️ IMPORTANT:</strong> Submission must be received before the deadline in Riyadh time. Convert these times to your local timezone to avoid missing the deadline.
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUIRED DOCUMENTS SECTION -->
+            <div class="section">
+                <h2>📑 Required Documents</h2>
+
+                <ul class="documents-list">
+                    <li>Signed quotation form (available in tender document)</li>
+                    <li>Certificate of Incorporation / Business Registration</li>
+                    <li>Tax Certificate / Tax ID proof</li>
+                    <li>Company Profile and credentials (max 5 pages)</li>
+                    <li>Product specifications and technical drawings</li>
+                    <li>Samples or product photos (email separately)</li>
+                    <li>Proof of insurance/liability coverage</li>
+                    <li>References from previous customers (minimum 2)</li>
+                    <li>Price quotation with delivery terms</li>
+                    <li>Proposed delivery schedule</li>
+                    <li>Bank details for payment (if awarded)</li>
+                </ul>
+
+                <div class="note-box">
+                    <strong>📌 NOTE:</strong> All documents must be submitted in PDF format unless otherwise specified. Original signatures can be scanned. Email all documents as attachments or compressed file.
+                </div>
+            </div>
+
+            <!-- SUBMISSION INSTRUCTIONS SECTION -->
+            <div class="section">
+                <h2>✉️ How to Submit</h2>
+
+                <div class="tender-info-grid">
+                    <div class="info-block">
+                        <div class="info-label">Submit To Email</div>
+                        <div class="info-value">
+                            <a href="mailto:procurement@riyadh.usembassy.gov?subject=Quote%20for%20RYD-2026-04521" class="link-button">📧 procurement@riyadh.usembassy.gov</a>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Email Subject Line</div>
+                        <div class="info-value">Quote for RYD-2026-04521 - [Your Company Name]</div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Submission Method</div>
+                        <div class="info-value">Email with PDF attachments or ZIP file</div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-label">Additional Files Link</div>
+                        <div class="info-value">
+                            <a href="#" target="_blank" class="link-button">📦 Download Tender Documents</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUMMARY & NOTES SECTION -->
+            <div class="section">
+                <h2>📝 Summary & Sourcing Notes</h2>
+
+                <div class="note-box" style="background: #e3f2fd; border-left-color: #2196F3;">
+                    <strong style="color: #1976d2;">KEY FINDINGS:</strong><br>
+                    • 3 items total: 25 desks, 50 chairs, 2 conference tables<br>
+                    • Mixed requirements: Items 1 & 3 allow equivalent/alternatives, Item 2 requires exact Herman Miller Aeron model<br>
+                    • Deadline: May 10, 2026 (22 days from publication)<br>
+                    • 45-50 day delivery required<br>
+                    • Contact: procurement@riyadh.usembassy.gov
+                </div>
+
+                <div class="export-section">
+                    <h3>💾 Export & Share Options</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+                        <button class="btn btn-secondary" onclick="exportToPDF()">📄 Export as PDF</button>
+                        <button class="btn btn-secondary" onclick="exportToExcel()">📊 Export to Excel</button>
+                        <button class="btn btn-secondary" onclick="shareReport()">📤 Share via Email</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="goBackToList()">← Back to Tender List</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+                <button class="btn btn-secondary" onclick="exportToPDF()">📥 Export as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportToPDF() {
+            alert('Exporting as PDF...\n\nThis will download the complete detailed report as a PDF file you can save and share.');
+        }
+
+        function exportToExcel() {
+            alert('Exporting to Excel...\n\nThis will create a spreadsheet with all items, dates, and submission details.');
+        }
+
+        function shareReport() {
+            alert('This will open your email client to share this report with your team or supplier contacts.');
+        }
+
+        function goBackToList() {
+            alert('Returning to tender list...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+// FIRESTORE SECURITY RULES
+// Copy and paste this into Firebase Console > Firestore > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // FUNCTION: Check if user is from mukatrade.com
+    function isMukatrade() {
+      return request.auth.token.email.matches('.*@mukatrade.com$');
+    }
+
+    // FUNCTION: Check if user is admin
+    function isAdmin() {
+      return request.auth.token.email == 'info@mukatrade.com';
+    }
+
+    // FUNCTION: Check if user owns the document or it's public
+    function canRead(userEmail) {
+      return resource.data.visibility == 'public' ||
+             resource.data.assigned_to == userEmail ||
+             isAdmin();
+    }
+
+    // FUNCTION: Only admins can write
+    function canWrite() {
+      return isAdmin();
+    }
+
+    // ============================================
+    // TENDERS COLLECTION
+    // ============================================
+    match /tenders/{tenderId} {
+      // Read: mukatrade.com users can read if public or assigned to them
+      allow read: if isMukatrade() && canRead(request.auth.token.email);
+
+      // Write: Only admin can write
+      allow write: if isAdmin();
+
+      // List sub-collections
+      match /items/{itemId} {
+        allow read: if isMukatrade();
+        allow write: if isAdmin();
+
+        match /sourcing_suggestions/{suggestionId} {
+          allow read: if isMukatrade();
+          allow write: if isAdmin();
+        }
+      }
+
+      match /documents/{docId} {
+        allow read: if isMukatrade();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ============================================
+    // SOURCING FILES COLLECTION
+    // ============================================
+    match /sourcing_files/{fileId} {
+      allow read: if isMukatrade() &&
+                     canRead(resource.data.assigned_to);
+      allow write: if isAdmin();
+
+      match /quotes/{quoteId} {
+        allow read: if isMukatrade();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ============================================
+    // FOLLOW UPS COLLECTION
+    // ============================================
+    match /follow_ups/{followUpId} {
+      allow read: if isMukatrade();
+      allow write: if isAdmin() ||
+                     request.auth.token.email == resource.data.assigned_to;
+    }
+
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    match /users/{userId} {
+      allow read: if request.auth.uid == userId || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================
+    // SETTINGS COLLECTION (Admin only)
+    // ============================================
+    match /settings/{settingId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================
+    // AGENT LOGS COLLECTION (For debugging)
+    // ============================================
+    match /agent_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================
+    // DENY ALL BY DEFAULT
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

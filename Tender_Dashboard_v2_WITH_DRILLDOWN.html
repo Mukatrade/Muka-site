@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Scraper Dashboard - With Drill-Down Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        /* TENDER LIST VIEW */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .tender-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .tender-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 5px solid #667eea;
+        }
+
+        .tender-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tender-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .tender-card h3 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .tender-number {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+
+        .tender-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            color: #999;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            color: #333;
+            margin-top: 3px;
+        }
+
+        .tender-items {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .tender-items-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .items-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .item-tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+
+        .tender-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .deadline {
+            color: #f44336;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .view-details-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .view-details-btn:hover {
+            background: #5568d3;
+        }
+
+        /* DETAIL VIEW */
+        .detail-header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .back-btn {
+            background: #757575;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #616161;
+        }
+
+        .detail-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-field {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .detail-field-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .detail-field-value {
+            color: #333;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.85em;
+            margin-top: 5px;
+            transition: background 0.3s;
+        }
+
+        .link-btn:hover {
+            background: #5568d3;
+        }
+
+        .item-detail {
+            background: #fafafa;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .item-detail-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .item-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .item-detail-field {
+            font-size: 0.9em;
+        }
+
+        .item-detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .item-detail-value {
+            color: #333;
+            margin-top: 3px;
+        }
+
+        .exact-match {
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .equivalent-ok {
+            background: #fff9c4;
+            color: #f57f17;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .timeline {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .timeline-item {
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .timeline-time {
+            font-size: 1em;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .timezone-note {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .doc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .doc-list li {
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            display: flex;
+            gap: 10px;
+        }
+
+        .doc-list li:before {
+            content: '✓';
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .tender-card-header {
+                flex-direction: column;
+            }
+
+            .tender-number {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .detail-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Tender Scraper Control Dashboard</h1>
+            <p style="color: #666; margin-bottom: 15px;">Find and analyze tenders with detailed sourcing reports</p>
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span><strong>Active</strong> - Scraper runs daily at 9:00 AM</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span><strong id="tenderCount">12</strong> new tenders today</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- LIST VIEW -->
+        <div id="listView" class="view active">
+            <div class="filters">
+                <input type="text" class="filter-input" placeholder="Search by embassy, tender number, or item..." id="searchInput" onkeyup="filterTenders()">
+                <button class="btn-secondary" onclick="toggleSettings()">⚙️ Settings</button>
+                <button class="btn-primary" onclick="refreshTenders()">🔄 Refresh</button>
+            </div>
+
+            <div class="tender-list" id="tenderList">
+                <!-- TENDER 1 -->
+                <div class="tender-card" onclick="showDetail(1)">
+                    <div class="tender-card-header">
+                        <div>
+                            <h3>Supply of Office Equipment and Furniture</h3>
+                            <div style="color: #999; font-size: 0.9em;">U.S. Embassy - Riyadh, Saudi Arabia</div>
+                        </div>
+                        <div class="tender-number">RYD-2026-04521</div>
+                    </div>
+                    <div class="tender-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value">Riyadh, Saudi Arabia</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Type</span>
+                            <span class="meta-value">Request for Quotation (RFQ)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Items</span>
+                            <span class="meta-value">3 items (desks, chairs, tables)</span>
+                        </div>
+                    </div>
+                    <div class="tender-items">
+                        <div class="tender-items-label">Items Included:</div>
+                        <div class="items-preview">
+                            <div class="item-tag">25x Office Desks</div>
+                            <div class="item-tag">50x Office Chairs</div>
+                            <div class="item-tag">2x Conference Tables</div>
+                        </div>
+                    </div>
+                    <div class="tender-footer">
+                        <div>
+                            <div class="meta-label">Deadline</div>
+                            <div class="deadline">May 10, 2026</div>
+                        </div>
+                        <button class="view-details-btn" onclick="event.stopPropagation(); showDetail(1)">View Details →</button>
+                    </div>
+                </div>
+
+                <!-- TENDER 2 -->
+                <div class="tender-card" onclick="showDetail(2)">
+                    <div class="tender-card-header">
+                        <div>
+                            <h3>Procurement of IT Hardware and Equipment</h3>
+                            <div style="color: #999; font-size: 0.9em;">U.S. Consulate - Mumbai, India</div>
+                        </div>
+                        <div class="tender-number">MUM-2026-08834</div>
+                    </div>
+                    <div class="tender-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value">Mumbai, India</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Type</span>
+                            <span class="meta-value">Request for Quotation (RFQ)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Items</span>
+                            <span class="meta-value">5 items (computers, peripherals)</span>
+                        </div>
+                    </div>
+                    <div class="tender-items">
+                        <div class="tender-items-label">Items Included:</div>
+                        <div class="items-preview">
+                            <div class="item-tag">20x Laptops</div>
+                            <div class="item-tag">20x Monitors</div>
+                            <div class="item-tag">Printers & Scanners</div>
+                            <div class="item-tag">+2 more items</div>
+                        </div>
+                    </div>
+                    <div class="tender-footer">
+                        <div>
+                            <div class="meta-label">Deadline</div>
+                            <div class="deadline">May 15, 2026</div>
+                        </div>
+                        <button class="view-details-btn" onclick="event.stopPropagation(); showDetail(2)">View Details →</button>
+                    </div>
+                </div>
+
+                <!-- TENDER 3 -->
+                <div class="tender-card" onclick="showDetail(3)">
+                    <div class="tender-card-header">
+                        <div>
+                            <h3>Supply of Janitorial and Cleaning Materials</h3>
+                            <div style="color: #999; font-size: 0.9em;">U.S. Embassy - Jakarta, Indonesia</div>
+                        </div>
+                        <div class="tender-number">JKT-2026-12456</div>
+                    </div>
+                    <div class="tender-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value">Jakarta, Indonesia</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Type</span>
+                            <span class="meta-value">Request for Quotation (RFQ)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Items</span>
+                            <span class="meta-value">12 items (cleaning products)</span>
+                        </div>
+                    </div>
+                    <div class="tender-items">
+                        <div class="tender-items-label">Items Included:</div>
+                        <div class="items-preview">
+                            <div class="item-tag">Cleaning Supplies</div>
+                            <div class="item-tag">Disinfectants</div>
+                            <div class="item-tag">Maintenance Materials</div>
+                        </div>
+                    </div>
+                    <div class="tender-footer">
+                        <div>
+                            <div class="meta-label">Deadline</div>
+                            <div class="deadline">May 8, 2026</div>
+                        </div>
+                        <button class="view-details-btn" onclick="event.stopPropagation(); showDetail(3)">View Details →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL VIEW -->
+        <div id="detailView" class="view">
+            <div class="detail-header">
+                <h2 id="detailTitle">Tender Details</h2>
+                <button class="back-btn" onclick="showList()">← Back to List</button>
+            </div>
+
+            <div class="detail-container">
+                <!-- TENDER OVERVIEW -->
+                <div class="detail-card">
+                    <h3>📍 Tender Overview</h3>
+                    <div class="detail-grid">
+                        <div class="detail-field">
+                            <div class="detail-field-label">Embassy</div>
+                            <div class="detail-field-value" id="detailEmbassy">U.S. Embassy - Riyadh, Saudi Arabia</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">Tender Number</div>
+                            <div class="detail-field-value" id="detailNumber">RYD-2026-04521</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">Contact Email</div>
+                            <div class="detail-field-value">
+                                <a href="#" class="link-btn" id="detailEmail">📧 Contact</a>
+                            </div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">Tender Page</div>
+                            <div class="detail-field-value">
+                                <a href="#" target="_blank" class="link-btn" id="detailLink">🔗 View Page</a>
+                            </div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">Tender Documents</div>
+                            <div class="detail-field-value">
+                                <a href="#" target="_blank" class="link-btn" id="detailFile">📄 Download PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEMS DETAIL -->
+                <div class="detail-card">
+                    <h3>📦 Items Requested (Click to expand)</h3>
+                    <div id="itemsDetail">
+                        <!-- Items will be populated here -->
+                    </div>
+                </div>
+
+                <!-- DATES -->
+                <div class="detail-card">
+                    <h3>⏰ Submission Deadlines</h3>
+                    <div class="timeline" id="datesDetail">
+                        <!-- Dates will be populated here -->
+                    </div>
+                </div>
+
+                <!-- DOCUMENTS -->
+                <div class="detail-card">
+                    <h3>📑 Required Documents</h3>
+                    <ul class="doc-list" id="docsDetail">
+                        <!-- Docs will be populated here -->
+                    </ul>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="detail-card">
+                    <h3>💾 Export & Share</h3>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="printReport()">🖨️ Print Report</button>
+                        <button class="btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
+                        <button class="btn-secondary" onclick="exportExcel()">📊 Export Excel</button>
+                        <button class="btn-secondary" onclick="shareReport()">📤 Share Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for tenders
+        const tenders = {
+            1: {
+                title: 'Supply of Office Equipment and Furniture',
+                embassy: 'U.S. Embassy - Riyadh, Saudi Arabia',
+                number: 'RYD-2026-04521',
+                email: 'procurement@riyadh.usembassy.gov',
+                link: 'https://sa.usembassy.gov/procurement-solicitation-packages-riyadh/',
+                file: 'RFQ_RYD-2026-04521.pdf',
+                items: [
+                    { name: 'Office Desks', qty: 25, specs: 'Wooden, 1.6m x 0.8m', exact: false, link: 'https://example.com/desk' },
+                    { name: 'Office Chairs', qty: 50, specs: 'Herman Miller Aeron, Mesh back', exact: true, link: 'https://example.com/aeron' },
+                    { name: 'Conference Table', qty: 2, specs: 'Seats 12-14 people', exact: false, link: 'https://example.com/table' }
+                ],
+                dates: {
+                    local: { time: 'May 10, 2026 at 02:00 PM', tz: 'AST (Arabia Standard Time, UTC+3)' },
+                    kerala: { time: 'May 10, 2026 at 04:30 PM', tz: 'IST (Indian Standard Time, UTC+5:30)' },
+                    kampala: { time: 'May 10, 2026 at 08:00 AM', tz: 'EAT (East Africa Time, UTC+3)' }
+                },
+                docs: [
+                    'Signed quotation form',
+                    'Certificate of Incorporation',
+                    'Tax Certificate / Tax ID',
+                    'Company Profile (max 5 pages)',
+                    'Product specifications and technical drawings',
+                    'Samples or product photos',
+                    'Proof of insurance/liability',
+                    'Customer references (minimum 2)',
+                    'Price quotation with delivery terms'
+                ]
+            },
+            2: {
+                title: 'Procurement of IT Hardware and Equipment',
+                embassy: 'U.S. Consulate - Mumbai, India',
+                number: 'MUM-2026-08834',
+                email: 'procurement@mumbai.usconsulate.gov',
+                link: 'https://in.usembassy.gov/embassy-consulates-contract-solicitations/',
+                file: 'RFQ_MUM-2026-08834.pdf',
+                items: [
+                    { name: 'Laptops', qty: 20, specs: 'Dell XPS 15, i7 processor', exact: true, link: 'https://example.com/dell-xps' },
+                    { name: 'Monitors', qty: 20, specs: '27-inch 4K monitors', exact: false, link: 'https://example.com/monitor' },
+                    { name: 'Printers', qty: 5, specs: 'HP LaserJet Pro', exact: false, link: 'https://example.com/printer' }
+                ],
+                dates: {
+                    local: { time: 'May 15, 2026 at 05:30 PM', tz: 'IST (Indian Standard Time, UTC+5:30)' },
+                    kerala: { time: 'May 15, 2026 at 05:30 PM', tz: 'IST (Same location)' },
+                    kampala: { time: 'May 15, 2026 at 07:00 AM', tz: 'EAT (East Africa Time, UTC+3)' }
+                },
+                docs: [
+                    'Signed quotation form',
+                    'Certificate of Incorporation',
+                    'GST Registration Certificate',
+                    'Company profile and brochures',
+                    'Technical specifications',
+                    'Warranty and after-sales support details'
+                ]
+            },
+            3: {
+                title: 'Supply of Janitorial and Cleaning Materials',
+                embassy: 'U.S. Embassy - Jakarta, Indonesia',
+                number: 'JKT-2026-12456',
+                email: 'procurement@jakarta.usembassy.gov',
+                link: 'https://id.usembassy.gov/invitation-for-bidding-jakarta/',
+                file: 'RFQ_JKT-2026-12456.pdf',
+                items: [
+                    { name: 'Cleaning Solutions', qty: '100L', specs: 'Floor cleaner, 5L containers', exact: false, link: 'https://example.com/cleaner' },
+                    { name: 'Disinfectants', qty: '50L', specs: 'EPA approved disinfectant', exact: false, link: 'https://example.com/disinfect' },
+                    { name: 'Trash Liners', qty: '5000', specs: '55-gallon bags, heavy-duty', exact: false, link: 'https://example.com/bags' }
+                ],
+                dates: {
+                    local: { time: 'May 8, 2026 at 03:00 PM', tz: 'WIB (Western Indonesia Time, UTC+7)' },
+                    kerala: { time: 'May 8, 2026 at 05:30 PM', tz: 'IST (Indian Standard Time, UTC+5:30)' },
+                    kampala: { time: 'May 8, 2026 at 07:00 AM', tz: 'EAT (East Africa Time, UTC+3)' }
+                },
+                docs: [
+                    'Quotation form',
+                    'Business license copy',
+                    'Tax ID (NPWP)',
+                    'Product datasheets',
+                    'Samples (if applicable)',
+                    'Delivery schedule'
+                ]
+            }
+        };
+
+        function showDetail(id) {
+            const tender = tenders[id];
+            document.getElementById('listView').classList.remove('active');
+            document.getElementById('detailView').classList.add('active');
+
+            document.getElementById('detailTitle').textContent = tender.title;
+            document.getElementById('detailEmbassy').textContent = tender.embassy;
+            document.getElementById('detailNumber').textContent = tender.number;
+            document.getElementById('detailEmail').textContent = '📧 ' + tender.email;
+            document.getElementById('detailEmail').href = 'mailto:' + tender.email;
+            document.getElementById('detailLink').href = tender.link;
+            document.getElementById('detailFile').href = '#';
+
+            // Populate items
+            let itemsHTML = '';
+            tender.items.forEach((item, idx) => {
+                itemsHTML += `
+                    <div class="item-detail">
+                        <div class="item-detail-title">Item ${idx + 1}: ${item.name}</div>
+                        <div class="item-detail-grid">
+                            <div class="item-detail-field">
+                                <div class="item-detail-label">Quantity</div>
+                                <div class="item-detail-value">${item.qty}</div>
+                            </div>
+                            <div class="item-detail-field">
+                                <div class="item-detail-label">Specifications</div>
+                                <div class="item-detail-value">${item.specs}</div>
+                            </div>
+                            <div class="item-detail-field">
+                                <div class="item-detail-label">Match Type</div>
+                                <div class="item-detail-value">
+                                    ${item.exact ? '<span class="exact-match">✓ Exact Match Required</span>' : '<span class="equivalent-ok">≈ Equivalents OK</span>'}
+                                </div>
+                            </div>
+                            <div class="item-detail-field">
+                                <div class="item-detail-label">Product Link</div>
+                                <div class="item-detail-value"><a href="${item.link}" target="_blank" class="link-btn">🔗 View Item</a></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('itemsDetail').innerHTML = itemsHTML;
+
+            // Populate dates
+            let datesHTML = `
+                <div class="timeline-item">
+                    <div class="timeline-label">Deadline - LOCAL TIME</div>
+                    <div class="timeline-time">${tender.dates.local.time}</div>
+                    <div class="timezone-note">${tender.dates.local.tz}</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-label">Deadline - KERALA, INDIA</div>
+                    <div class="timeline-time">${tender.dates.kerala.time}</div>
+                    <div class="timezone-note">${tender.dates.kerala.tz}</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-label">Deadline - KAMPALA, UGANDA</div>
+                    <div class="timeline-time">${tender.dates.kampala.time}</div>
+                    <div class="timezone-note">${tender.dates.kampala.tz}</div>
+                </div>
+            `;
+            document.getElementById('datesDetail').innerHTML = datesHTML;
+
+            // Populate docs
+            let docsHTML = '';
+            tender.docs.forEach(doc => {
+                docsHTML += `<li>${doc}</li>`;
+            });
+            document.getElementById('docsDetail').innerHTML = docsHTML;
+        }
+
+        function showList() {
+            document.getElementById('detailView').classList.remove('active');
+            document.getElementById('listView').classList.add('active');
+        }
+
+        function filterTenders() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.tender-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(search) ? 'block' : 'none';
+            });
+        }
+
+        function toggleSettings() {
+            alert('Settings panel would open here');
+        }
+
+        function refreshTenders() {
+            alert('Refreshing tender list...');
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function exportPDF() {
+            alert('Exporting as PDF...');
+        }
+
+        function exportExcel() {
+            alert('Exporting to Excel...');
+        }
+
+        function shareReport() {
+            alert('Sharing via email...');
+        }
+    </script>
+</body>
+</html>
